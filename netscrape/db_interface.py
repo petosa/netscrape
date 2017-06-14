@@ -18,7 +18,7 @@ class db_interface():
         else:
             return None
 
-    def add_navigator(self, args):
+    def put_navigator(self, args):
         document = {
             "name": args["name"],
             "next": args["next"],

@@ -1,6 +1,7 @@
 # Custom
 .idea/
 mongodb-data/
+netscrape/netscrape.log
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
