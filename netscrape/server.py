@@ -1,15 +1,17 @@
 import json
 import sys
 import logging
-import traceback
 
 from flask import Flask
 from pymongo import MongoClient
-from flask_restful import reqparse, Api, Resource, abort
+from flask_restful import reqparse, Api, Resource, abort, inputs
 
 from netscrape.daemon import daemon
 from netscrape.db_interface import db_interface
 
+def service_failed(e):
+    logging.exception("Unable to fulfill get_schedule request.")
+    return abort(400, message="Unable to fulfill request: " + str(e))
 
 class Schedule(Resource):
 
@@ -17,8 +19,7 @@ class Schedule(Resource):
         try:
             return json.loads(interface.get_schedule()), 200
         except Exception as e:
-            logging.exception("Unable to fulfill get_schedule request.")
-            return abort(400, message="Unable to fulfill get_schedule request: " + str(e))
+            return service_failed(e)
 
     def put(self):
         try:
@@ -29,8 +30,7 @@ class Schedule(Resource):
             else:
                 return "A navigator with the name " + args["name"] + " already exists.", 409
         except Exception as e:
-            logging.exception("Unable to fulfill put_navigator request.")
-            return abort(400, message="Unable to fulfill put_navigator request: " + str(e))
+            return service_failed(e)
 
 
 
@@ -44,22 +44,19 @@ class Navigator(Resource):
             else:
                 return "A navigator with the name " + navigator_name + " does not exist.", 404
         except Exception as e:
-            logging.exception("Unable to fulfill get_navigator request for " + navigator_name + ".")
-            return abort(400, message="Unable to fulfill get_navigator request for " + navigator_name + ": " + str(e))
+            return service_failed(e)
 
     def patch(self, navigator_name):
         try:
-            return interface.update_navigator(navigator_name, parser.parse_args())
+            return interface.update_navigator(navigator_name, fuzzy_parser.parse_args())
         except Exception as e:
-            logging.exception("Unable to fulfill update_navigator request for " + navigator_name + ".")
-            return abort(400, message="Unable to fulfill update_navigator request for " + navigator_name + ": " + str(e))
+            return service_failed(e)
 
     def delete(self, navigator_name):
         try:
             return interface.delete_navigator(navigator_name)
         except Exception as e:
-            logging.exception("Unable to fulfill delete_navigator request for " + navigator_name + ".")
-            return abort(400, message="Unable to fulfill delete_navigator request for " + navigator_name + ": " + str(e))
+            return service_failed(e)
 
 
 if __name__ == '__main__':
@@ -79,8 +76,18 @@ if __name__ == '__main__':
     parser.add_argument('next', type=int, required=True)
     parser.add_argument('every', type=int, required=True)
     parser.add_argument('times', type=int, required=True)
-    parser.add_argument('save', required=True)
+    parser.add_argument('save', type=inputs.boolean , required=True)
+    parser.add_argument('schema', type=inputs.boolean , required=True)
     parser.add_argument('function', required=True)
+
+    fuzzy_parser = reqparse.RequestParser()
+    fuzzy_parser.add_argument('name')
+    fuzzy_parser.add_argument('next', type=int)
+    fuzzy_parser.add_argument('every', type=int)
+    fuzzy_parser.add_argument('times', type=int)
+    fuzzy_parser.add_argument('save', type=inputs.boolean )
+    fuzzy_parser.add_argument('schema', type=inputs.boolean )
+    fuzzy_parser.add_argument('function')
 
     api.add_resource(Navigator, '/schedule/<navigator_name>')
     api.add_resource(Schedule, '/schedule')
