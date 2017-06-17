@@ -84,7 +84,7 @@ def test_medium_list_false():
     assert (not db().schema_assertion(A, B))
 
 def test_medium_dict_true():
-    A = {"hey": 1234155135135135135153135135135135332523523531}
+    A = {"hey": 12323531}
     B = {"hey": 1}
     assert (db().schema_assertion(A, B))
     A = {"": ""}
