@@ -22,4 +22,4 @@ install:
   - pip install .
 
 # command to run tests
-script: test.py -v
+script: py.test -v
