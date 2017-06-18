@@ -1,4 +1,5 @@
 from bson.json_util import dumps
+import json
 
 class db_interface():
 
@@ -21,6 +22,7 @@ class db_interface():
     def put_navigator(self, args):
         document = {
             "name": args["name"],
+            "description": args["description"],
             "next": args["next"],
             "every": args["every"],
             "times": args["times"],
@@ -62,7 +64,7 @@ class db_interface():
         cursor = self.client[self.data_db][name].find().limit(1).sort("creation_date", -1)
         if cursor.count() == 0:
             return None
-        return cursor.next()
+        return json.loads(dumps(cursor.next()))
 
     # Boolean function which returns whether the schema of the new data is the same as existing data
     def schema_assertion(self, new_data, old_data):
@@ -91,3 +93,7 @@ class db_interface():
             return True
         except AssertionError:
             return False
+
+    # Return full data history of a navigator
+    def get_history(self, name):
+        return json.loads(dumps(self.client[self.data_db][name].find().sort("creation_date", -1)))

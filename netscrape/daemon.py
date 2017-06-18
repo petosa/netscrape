@@ -8,7 +8,7 @@ from pymongo.errors import AutoReconnect, ConnectionFailure
 from netscrape.utility import utility
 
 
-class daemon():
+class daemon:
 
     def __init__(self, interface):
         self.util = utility()
