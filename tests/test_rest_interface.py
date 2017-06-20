@@ -73,7 +73,7 @@ def test_simple_get():
         "function": "output = ['Not', 'bad']"
     }))
     sleep(1)
-    assert("[\n    \"Not\",\n    \"bad\"\n]" in l.records[0].getMessage())
+    assert("[\n\"Not\",\n\"bad\"\n]" in l.records[0].getMessage().replace(" ", ""))
     sched = interface.get_schedule()
     assert (len(sched) == 1)
     assert(sched[0]["times"] == 0)
