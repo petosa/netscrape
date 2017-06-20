@@ -12,13 +12,13 @@ from netscrape.db_interface import db_interface
 def start(app, interface):
 
     def service_failed(e):
+        logging.exception("Unable to fulfill request. " + str(e))
         return abort(400, message="Unable to fulfill request: " + str(e))
 
     class Schedule(Resource):
 
         def get(self):
             try:
-                logging.info("UKUGNGGG")
                 return interface.get_schedule(), 200
             except Exception as e:
                 return service_failed(e)
