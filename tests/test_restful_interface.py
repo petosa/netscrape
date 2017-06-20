@@ -63,8 +63,8 @@ def test_simple_get():
     interface = get_interface()
     assert(interface.get_schedule() == [])
     oid = (interface.put_navigator({
-        "name": "ArizonaIcedTea載",
-        "description": "現續保",
+        "name": "ArizonaIcedTea",
+        "description": "Tea",
         "next": 0,
         "every": 1,
         "times": 1,
@@ -78,13 +78,13 @@ def test_simple_get():
     assert (len(sched) == 1)
     assert(sched[0]["times"] == 0)
     assert(sched[0]["_id"]["$oid"] == oid)
-    assert(sched[0]["name"] == "ArizonaIcedTea載")
-    assert(sched[0]["description"] == "現續保")
+    assert(sched[0]["name"] == "ArizonaIcedTea")
+    assert(sched[0]["description"] == "Tea")
     assert(sched[0]["every"] == 1)
     assert(sched[0]["save"] == False)
-    assert(interface.get_navigator("ArizonaIcedTea載") != None)
+    assert(interface.get_navigator("ArizonaIcedTea") != None)
 
-    assert(interface.delete_navigator("ArizonaIcedTea載") == 1)
+    assert(interface.delete_navigator("ArizonaIcedTea") == 1)
     assert (interface.get_schedule() == [])
     interface.close_stream()
     l.uninstall()
