@@ -41,9 +41,11 @@ def setup():
     app = Flask(__name__)
     interface = get_interface()
     daemon(interface)
-    mongo_thread = Process(target=launch_mongo, daemon=True)
+    mongo_thread = Process(target=launch_mongo)
+    mongo_thread.daemon = True
     mongo_thread.start()
-    server_thread = Process(target=launch_server, args=[app, interface], daemon=True)
+    server_thread = Process(target=launch_server, args=[app, interface])
+    server_thread.daemon = True
     server_thread.start()
     yield
 

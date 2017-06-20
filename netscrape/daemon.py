@@ -13,7 +13,8 @@ class daemon:
     def __init__(self, interface):
         self.util = utility()
         self.interface = interface
-        thread = Thread(target=self.start, daemon=True)
+        thread = Thread(target=self.start)
+        thread.daemon = True
         thread.start()
 
     def start(self):
@@ -27,7 +28,8 @@ class daemon:
                     if peek["times"] != -1:
                         # Finite number of iterations, decrement times fields.
                         self.interface.update_navigator(peek["name"], {"times": peek["times"] - 1})
-                    thread = Thread(target=self.worker, args=(peek,), daemon=True)
+                    thread = Thread(target=self.worker, args=(peek,))
+                    thread.daemon = True
                     thread.start()
         except (AutoReconnect, ConnectionFailure):
             logging.exception("Unable to connect to Mongo database. Scheduler cannot get next task.")
