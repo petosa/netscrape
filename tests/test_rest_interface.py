@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import os
 import shutil
 import signal
@@ -69,7 +71,7 @@ def test_simple_get():
         "function": "output = ['Not', 'bad']"
     }))
     sleep(1)
-    assert("[\n    \"Not\",\n    \"bad\"\n]" in l.records[0].msg)
+    assert("[\n    \"Not\",\n    \"bad\"\n]" in l.records[0].getMessage())
     sched = interface.get_schedule()
     assert (len(sched) == 1)
     assert(sched[0]["times"] == 0)
