@@ -10,7 +10,7 @@ class db_interface():
         self.schedule_col = schedule_col
 
     def get_schedule(self):
-        return dumps(self.client[self.system_db][self.schedule_col].find())
+        return json.loads(dumps(self.client[self.system_db][self.schedule_col].find()))
 
     def get_navigator(self, name):
         nav = self.client[self.system_db][self.schedule_col].find({"name": name})
@@ -59,7 +59,7 @@ class db_interface():
         }
         return str((self.client[self.data_db][name].insert_one(document)).inserted_id)
 
-    # Retrieves the freshes record from the 'name' data collection.
+    # Retrieves the freshest record from the 'name' data collection.
     def get_newest_data(self, name):
         cursor = self.client[self.data_db][name].find().limit(1).sort("creation_date", -1)
         if cursor.count() == 0:
@@ -77,11 +77,11 @@ class db_interface():
                     assert(recur(A[key], B[key]))
             elif type(A) is list and type(B) is list:
                 if len(A) > 0 and len(B) > 0:
-                    for a in range(len(A)): # Assert that all elements of both lists have the same schema..
+                    for a in range(len(A)): # Assert that all elements of both lists have the same type..
                         for b in range(len(B)):
                             assert(recur(A[a], B[b]))
                 if len(A) > 1:
-                    for x in range(len(A)): # and then make sure all elements of our new list have the same schema.
+                    for x in range(len(A)): # and then make sure all elements of our new list have the same type.
                         for y in range(len(A)):
                             assert(recur(A[x], A[y]))
             else:
@@ -97,3 +97,6 @@ class db_interface():
     # Return full data history of a navigator
     def get_history(self, name):
         return json.loads(dumps(self.client[self.data_db][name].find().sort("creation_date", -1)))
+
+    def close_stream(self):
+        self.client.close()
