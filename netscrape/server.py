@@ -1,4 +1,3 @@
-import json
 import sys
 import logging
 
@@ -121,6 +120,7 @@ if __name__ == '__main__':
 
     logging.basicConfig(filename='netscrape.log', level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     app = Flask(__name__)
+    logging.info("Starting server.")
 
     client = MongoClient(sys.argv[1])
     system_db = "sys"

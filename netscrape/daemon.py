@@ -1,30 +1,33 @@
-from threading import Thread
 import logging
 import json
-from bson.json_util import loads, dumps
+import time
 
+from bson.json_util import loads, dumps
+from threading import Thread
 from pymongo.errors import AutoReconnect, ConnectionFailure
 
 from netscrape.utility import utility
 
-
 class daemon:
 
     def __init__(self, interface):
-        self.util = utility()
         self.interface = interface
+        self.utility = utility(self.interface)
         thread = Thread(target=self.start)
         thread.daemon = True
         thread.start()
+
+    def time_now(self):
+        return int(round(time.time() * 1000))
 
     def start(self):
         try:
             while True:
                 peek = self.interface.get_next()
                 # Only pop if we have a navigator and its time to pop has come.
-                if peek and peek["next"] <= self.util.time_now():
+                if peek and peek["next"] <= self.time_now():
                     # Update next execution time.
-                    self.interface.update_navigator(peek["name"], {"next": self.util.time_now() + peek["every"]})
+                    self.interface.update_navigator(peek["name"], {"next": self.time_now() + peek["every"]})
                     if peek["times"] != -1:
                         # Finite number of iterations, decrement times fields.
                         self.interface.update_navigator(peek["name"], {"times": peek["times"] - 1})
@@ -39,9 +42,13 @@ class daemon:
             self.critical_scheduler_error()
 
     def worker(self, nav):
+        call_time = self.time_now()
+        print("start " + str(self.time_now()))
         loc = {}
         try:
-            exec(nav["function"], {}, loc)
+            print("exec " + str(self.time_now()))
+            exec(nav["function"], {"utility": self.utility}, loc)
+            print("doneexec " + str(self.time_now()))
         except Exception as e:
             logging.exception("Failure in internal navigator function for " + nav["name"] + ".")
             self.critical_navigator_error(nav["name"])
@@ -49,7 +56,7 @@ class daemon:
             try:
                 parsed_json = loc["output"]
                 parsed_bson = loads(json.dumps(loc["output"])) # JSON -> String -> BSON
-                logging.info("Navigator " + nav["name"] + " has scraped the following data:\n" + json.dumps(parsed_json, indent=4))
+                #logging.info("Navigator " + nav["name"] + " has scraped the following data:\n" + json.dumps(parsed_json, indent=4))
             except TypeError:
                 logging.exception("The output string for navigator " + nav["name"] + " cannot be parsed into JSON.")
                 self.critical_navigator_error(nav["name"])
@@ -58,15 +65,18 @@ class daemon:
                 latest = json.loads(dumps(self.interface.get_newest_data(nav["name"]))) # BSON -> String -> JSON
                 try:
                     if nav["schema"] and latest: # Only run if this is not the first element to be added to this data collection.
+                        print("schema " + str(self.time_now()))
                         assert(self.interface.schema_assertion(parsed_json, latest["data"]))
-                    self.interface.save(nav["name"], parsed_bson, utility.time_now(self))
+                        print("schemadone+save " + str(self.time_now()))
+                    self.interface.save_data(nav["name"], parsed_bson, call_time)
+                    print("savedone " + str(self.time_now()))
                     if nav["schema"]:
                         logging.info("SCHEMA PASSED ✔")
                     logging.info("SAVED " + nav["name"])
                 except AssertionError:
                     logging.exception("Schema assertion has failed! The underlying data structure for " + nav["name"] + " has changed.")
-                    logging.error("Current schema:\n" + json.dumps(parsed_json, indent=4))
-                    logging.error("Old schema:\n" + dumps(latest["data"], indent=4))
+                    #logging.error("Current schema:\n" + json.dumps(parsed_json, indent=4))
+                    #logging.error("Old schema:\n" + dumps(latest["data"], indent=4))
                     self.critical_navigator_error(nav["name"])
         else:
             logging.error("Navigator " + nav["name"] + " does not set 'output' value in its parse function. Failed.")

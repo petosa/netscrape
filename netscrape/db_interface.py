@@ -15,7 +15,7 @@ class db_interface():
     def get_navigator(self, name):
         nav = self.client[self.system_db][self.schedule_col].find({"name": name})
         if nav.count() == 1:
-            return nav[0]
+            return json.loads(dumps(nav[0]))
         else:
             return None
 
@@ -41,18 +41,21 @@ class db_interface():
             if args[key] != None:
                 update_document[key] = args[key]
         update = self.client[self.system_db][self.schedule_col].update_one({"name": name}, {"$set": update_document})
+        if "name" in args:
+            self.client[self.data_db][name].rename(args["name"])
         return update.modified_count
 
     def delete_navigator(self, name):
         result = self.client[self.system_db][self.schedule_col].delete_one({'name': name})
+        self.client[self.data_db][name].remove()
         return result.deleted_count
 
     # Returns the navigator next in line to be executed. This means that this is the navigator with the smallest next value
     # and which either has a positive or infinite number of runs left.
     def get_next(self):
-        return self.client[self.system_db][self.schedule_col].find_one({"$query": {"times": {"$ne": 0}}, "$orderby": {"next": 1}})
+        return json.loads(dumps(self.client[self.system_db][self.schedule_col].find_one({"$query": {"times": {"$ne": 0}}, "$orderby": {"next": 1}})))
 
-    def save(self, name, output, timestamp):
+    def save_data(self, name, output, timestamp):
         document = {
             "data": output,
             "creation_date": timestamp
