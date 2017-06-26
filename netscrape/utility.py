@@ -1,6 +1,5 @@
 import csv
-import urllib.request
-
+import requests
 
 class utility():
 
@@ -13,12 +12,13 @@ class utility():
     def get_history(self, name):
         return self.interface.get_history(name)
 
-    def download_page_utf8(self, url):
-        return urllib.request.urlopen(url).read().decode("utf-8")
+    def download_page_with_encoding(self, url, encoding):
+        r = requests.get(url)
+        r.encoding = encoding
+        return r.text
 
     def download_page(self, url):
-        response = urllib.request.urlopen(url)
-        return response.read().decode(response.headers.get_content_charset())
+        return requests.get(url).text
 
     def consume_table(self, table_soup):
         data = []

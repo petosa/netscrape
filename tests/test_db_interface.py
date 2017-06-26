@@ -1,5 +1,3 @@
-# coding=utf-8
-
 from time import sleep
 
 import pytest
@@ -113,5 +111,22 @@ def test_utility():
     assert len(interface().get_newest_data("SnapplePeachTea")["data"]) == 5
     d.stop()
 
-def test_data_added():
-    assert len(interface().get_schedule()) == 0
+def test_url_download():
+    d = daemon(interface())
+    assert len(interface().get_history("ArizonaIcedTea")) == 0
+    interface().put_navigator({
+        "name": "ArizonaIcedTea",
+        "description": "Tea",
+        "next": 0,
+        "every": 1,
+        "times": 1,
+        "save": True,
+        "schema": False,
+        "function": "output = utility.download_page_with_encoding(\"http://www.example.com/\", \"utf8\")"
+    })
+    sleep(3)
+    assert len(interface().get_schedule()) == 1
+    assert interface().get_newest_data("ArizonaIcedTea") != None
+    assert "Example Domain" in interface().get_newest_data("ArizonaIcedTea")["data"]
+
+    d.stop()
