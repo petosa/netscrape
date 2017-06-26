@@ -41,6 +41,7 @@ def test_simple_put():
         "schema": False,
         "function": "output = \"Answer\""
     })
+    sleep(1)
     assert len(interface().get_schedule()) == 1
     assert interface().get_newest_data("ArizonaIcedTea") == None
     assert len(interface().get_history("ArizonaIcedTea")) == 0
@@ -59,6 +60,7 @@ def test_simple_put_saved():
         "schema": False,
         "function": "output = \"Answer\""
     })
+    sleep(1)
     assert len(interface().get_schedule()) == 1
     assert interface().get_newest_data("ArizonaIcedTea") != None
     assert len(interface().get_history("ArizonaIcedTea")) == 1
