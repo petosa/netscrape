@@ -13,17 +13,20 @@ class daemon:
     def __init__(self, interface):
         self.interface = interface
         self.utility = utility(self.interface)
+        self.alive = True
         thread = Thread(target=self.start)
         thread.daemon = True
         thread.start()
+
+    def stop(self):
+        self.alive = False
 
     def time_now(self):
         return int(round(time.time() * 1000))
 
     def start(self):
         try:
-            while True:
-                time.sleep(.1)
+            while self.alive:
                 peek = self.interface.get_next()
                 # Only pop if we have a navigator and its time to pop has come.
                 if peek and peek["next"] <= self.time_now():
