@@ -23,6 +23,7 @@ class daemon:
     def start(self):
         try:
             while True:
+                time.sleep(.1)
                 peek = self.interface.get_next()
                 # Only pop if we have a navigator and its time to pop has come.
                 if peek and peek["next"] <= self.time_now():
@@ -43,12 +44,9 @@ class daemon:
 
     def worker(self, nav):
         call_time = self.time_now()
-        print("start " + str(self.time_now()))
         loc = {}
         try:
-            print("exec " + str(self.time_now()))
             exec(nav["function"], {"utility": self.utility}, loc)
-            print("doneexec " + str(self.time_now()))
         except Exception as e:
             logging.exception("Failure in internal navigator function for " + nav["name"] + ".")
             self.critical_navigator_error(nav["name"])
@@ -65,11 +63,8 @@ class daemon:
                 latest = json.loads(dumps(self.interface.get_newest_data(nav["name"]))) # BSON -> String -> JSON
                 try:
                     if nav["schema"] and latest: # Only run if this is not the first element to be added to this data collection.
-                        print("schema " + str(self.time_now()))
                         assert(self.interface.schema_assertion(parsed_json, latest["data"]))
-                        print("schemadone+save " + str(self.time_now()))
                     self.interface.save_data(nav["name"], parsed_bson, call_time)
-                    print("savedone " + str(self.time_now()))
                     if nav["schema"]:
                         logging.info("SCHEMA PASSED ✔")
                     logging.info("SAVED " + nav["name"])

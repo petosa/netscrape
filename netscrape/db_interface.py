@@ -101,5 +101,10 @@ class db_interface():
     def get_history(self, name):
         return json.loads(dumps(self.client[self.data_db][name].find().sort("creation_date", -1)))
 
+    # DANGEROUS: Deletes all schedules and data for this client.
+    def nuke(self):
+        self.client.drop_database(self.system_db)
+        self.client.drop_database(self.data_db)
+
     def close_stream(self):
         self.client.close()
