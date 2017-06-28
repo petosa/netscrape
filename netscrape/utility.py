@@ -27,8 +27,6 @@ class utility():
             document = {}
             for index, cell in enumerate(row.select("td")):
                 document[headers[index].get_text().strip()] = cell.get_text().strip()
-                print(headers[index].get_text())
-                print(cell.get_text())
             if document != {}:
                 data.append(document)
         return data

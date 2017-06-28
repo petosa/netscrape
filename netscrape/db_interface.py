@@ -41,7 +41,7 @@ class db_interface():
             if args[key] != None:
                 update_document[key] = args[key]
         update = self.client[self.system_db][self.schedule_col].update_one({"name": name}, {"$set": update_document})
-        if "name" in args:
+        if args["name"]:
             self.client[self.data_db][name].rename(args["name"])
         return update.modified_count
 
