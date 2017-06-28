@@ -1,4 +1,4 @@
-import sys
+import os
 import logging
 
 from flask import Flask
@@ -9,41 +9,37 @@ from netscrape.daemon import daemon
 from netscrape.db_interface import db_interface
 
 
-if __name__ == '__main__':
+logging.basicConfig(filename="netscrape.log", level=logging.INFO, format="[%(asctime)s] %(levelname)s: %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p")
+app = Flask(__name__)
+logging.info("Starting server.")
+client = MongoClient(os.environ["MONGO"])
+system_db = "sys"
+data_db = "data"
+schedule_col = "schedule"
+interface = db_interface(client, system_db, data_db, schedule_col)
+daemon(interface)
 
-    logging.basicConfig(filename='netscrape.log', level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-    app = Flask(__name__)
-    logging.info("Starting server.")
+# Set up body parsing for put
+parser = reqparse.RequestParser()
+parser.add_argument("name", required=True)
+parser.add_argument("description", required=False)
+parser.add_argument("next", type=int, required=True)
+parser.add_argument("every", type=int, required=True)
+parser.add_argument("times", type=int, required=True)
+parser.add_argument("save", type=inputs.boolean, required=True)
+parser.add_argument("schema", type=inputs.boolean, required=True)
+parser.add_argument("function", required=True)
 
-    client = MongoClient(sys.argv[1])
-    system_db = "sys"
-    data_db = "data"
-    schedule_col = "schedule"
-    interface = db_interface(client, system_db, data_db, schedule_col)
-
-    daemon(interface)
-
-    # Set up body parsing for put
-    parser = reqparse.RequestParser()
-    parser.add_argument('name', required=True)
-    parser.add_argument('description', required=False)
-    parser.add_argument('next', type=int, required=True)
-    parser.add_argument('every', type=int, required=True)
-    parser.add_argument('times', type=int, required=True)
-    parser.add_argument('save', type=inputs.boolean, required=True)
-    parser.add_argument('schema', type=inputs.boolean, required=True)
-    parser.add_argument('function', required=True)
-
-    # Set up body parsing for update
-    fuzzy_parser = reqparse.RequestParser()
-    fuzzy_parser.add_argument('name')
-    fuzzy_parser.add_argument('description')
-    fuzzy_parser.add_argument('next', type=int)
-    fuzzy_parser.add_argument('every', type=int)
-    fuzzy_parser.add_argument('times', type=int)
-    fuzzy_parser.add_argument('save', type=inputs.boolean)
-    fuzzy_parser.add_argument('schema', type=inputs.boolean)
-    fuzzy_parser.add_argument('function')
+# Set up body parsing for update
+fuzzy_parser = reqparse.RequestParser()
+fuzzy_parser.add_argument("name")
+fuzzy_parser.add_argument("description")
+fuzzy_parser.add_argument("next", type=int)
+fuzzy_parser.add_argument("every", type=int)
+fuzzy_parser.add_argument("times", type=int)
+fuzzy_parser.add_argument("save", type=inputs.boolean)
+fuzzy_parser.add_argument("schema", type=inputs.boolean)
+fuzzy_parser.add_argument("function")
 
 def service_failed(e):
     logging.exception("Unable to fulfill request. " + str(e))
@@ -128,4 +124,4 @@ api.add_resource(ManyData, '/data/<navigator_name>')
 
 
 
-app.run(debug=False)
+app.run(port=9000)
