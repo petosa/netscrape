@@ -12,11 +12,18 @@ from netscrape.db_interface import db_interface
 logging.basicConfig(filename="netscrape.log", level=logging.INFO, format="[%(asctime)s] %(levelname)s: %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p")
 app = Flask(__name__)
 logging.info("Starting server.")
-client = MongoClient(os.environ["MONGO"])
+client = MongoClient(os.environ["MONGO_URI"])
 system_db = "sys"
 data_db = "data"
 schedule_col = "schedule"
-interface = db_interface(client, system_db, data_db, schedule_col)
+username = None
+password = None
+try:
+    username = os.environ["MONGO_USER"]
+    password = os.environ["MONGO_PASS"]
+except KeyError:
+    logging.info("Running without authentication.")
+interface = db_interface(client, system_db, data_db, schedule_col, username=username, password=password)
 daemon(interface)
 
 # Set up body parsing for put

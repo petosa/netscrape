@@ -3,11 +3,13 @@ import json
 
 class db_interface():
 
-    def __init__(self, client, system_db, data_db, schedule_col):
+    def __init__(self, client, system_db, data_db, schedule_col, username=None, password=None,):
         self.client = client
         self.system_db = system_db
         self.data_db = data_db
         self.schedule_col = schedule_col
+        if username and password:
+            client["admin"].authenticate(username, password)
 
     def get_schedule(self):
         return json.loads(dumps(self.client[self.system_db][self.schedule_col].find()))
