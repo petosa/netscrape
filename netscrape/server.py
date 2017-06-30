@@ -131,4 +131,4 @@ api.add_resource(ManyData, '/data/<navigator_name>')
 
 
 
-app.run(port=9000)
+app.run(port=os.environ["FLASK_PORT"])
