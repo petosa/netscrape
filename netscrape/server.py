@@ -16,14 +16,11 @@ client = MongoClient(os.environ["MONGO_URI"])
 system_db = "sys"
 data_db = "data"
 schedule_col = "schedule"
-username = None
-password = None
 try:
-    username = os.environ["MONGO_USER"]
-    password = os.environ["MONGO_PASS"]
+    interface = db_interface(client, system_db, data_db, schedule_col, username=os.environ["MONGO_USER"], password=os.environ["MONGO_PASS"])
 except KeyError:
     logging.info("Running without authentication.")
-interface = db_interface(client, system_db, data_db, schedule_col, username=username, password=password)
+    interface = db_interface(client, system_db, data_db, schedule_col)
 daemon(interface)
 
 # Set up body parsing for put
