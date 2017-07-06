@@ -48,28 +48,26 @@
             <h1>Netscrape</h1>
             <p>Use this form to test and submit a new navigator.</p>
          </div>
-         <form>
+         <form onsubmit="return validateForm()">
             <div class="form-group input-group-lg">
                <label>Name:</label>
                <input type="text" class="form-control" id="name">
             </div>
             <div class="form-group input-group-lg">
-               <label >Description:</label>
+               <label>Description:</label>
                <input type="text" class="form-control" id="description">
             </div>
             <div class="row" style="padding-bottom: 30px;">
                <div class="col-lg-2">
                   <div class="input-group-lg">
                      <label>Run every:</label>
-                     <input type="number" class="form-control" min=1>
+                     <input type="number" class="form-control" min=1 id="runevery">
                   </div>
-                  <!-- /input-group -->
                </div>
-               <!-- /.col-lg-6 -->
                <div class="col-lg-2">
                   <div class="input-group-lg">
                      <label>Time scale:</label>
-                     <select class="form-control">
+                     <select class="form-control" id="scale">
                         <option>ms</option>
                         <option>sec</option>
                         <option>min</option>
@@ -78,7 +76,30 @@
                      </select>
                   </div>
                </div>
-               <!-- /.col-lg-6 -->
+               <div class="col-lg-2">
+                  <div class="input-group-lg">
+                     <label>Run indefinitely?</label>
+                     <input type="checkbox" class="form-control" onclick="document.getElementById('times').disabled = !document.getElementById('times').disabled" checked="true" id="infinite">
+                  </div>
+               </div>
+               <div class="col-lg-2">
+                  <div class="input-group-lg">
+                     <label>Run this many times:</label>
+                     <input type="number" class="form-control" min=0 disabled="true" id="times">
+                  </div>
+               </div>
+               <div class="col-lg-2">
+                  <div class="input-group-lg">
+                     <label>Save?</label>
+                     <input type="checkbox" class="form-control" id="save">
+                  </div>
+               </div>
+               <div class="col-lg-2">
+                  <div class="input-group-lg">
+                     <label>Enforce schema?</label>
+                     <input type="checkbox" class="form-control" id="schema">
+                  </div>
+               </div>
             </div>
             <!-- /.row -->
             <textarea id="code" rows="4" cols="50"># Put you navigator code here.</textarea>

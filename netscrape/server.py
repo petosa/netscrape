@@ -2,6 +2,7 @@ import os
 import logging
 
 from flask import Flask
+from flask_cors import CORS
 from pymongo import MongoClient
 from flask_restful import reqparse, Api, Resource, abort, inputs
 
@@ -11,6 +12,7 @@ from netscrape.db_interface import db_interface
 
 logging.basicConfig(filename="netscrape.log", level=logging.INFO, format="[%(asctime)s] %(levelname)s: %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p")
 app = Flask(__name__)
+CORS(app)
 logging.info("Starting server.")
 client = MongoClient(os.environ["MONGO_URI"])
 system_db = "sys"
