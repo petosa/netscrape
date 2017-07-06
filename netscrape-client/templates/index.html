@@ -10,8 +10,6 @@
       <script src="js/codemirror.js"></script>
       <script src="js/python.js"></script>
       <script src="js/jquery-3.2.1.min.js"></script>
-      <script src="js/netscrape.js"></script>
-
       <link href="css/codemirror.css" rel="stylesheet">
       <link href="css/bootstrap.min.css" rel="stylesheet">
       <link href="css/icecoder.css" rel="stylesheet">
@@ -47,6 +45,12 @@
          <div class="jumbotron" style="margin-top:80px">
             <h1>Netscrape</h1>
             <p>Use this form to test and submit a new navigator.</p>
+         </div>
+         <div class="alert alert-success" id="successAlert" style="display: none;">
+            <strong>Success!</strong> Navigator <span id="successName">name</span> has been created with id <span id="successId">id</span>.
+         </div>
+         <div class="alert alert-danger" id="failedAlert" style="display: none;">
+           <strong>Failed.</strong> <span id="failedMessage"></span>
          </div>
          <form onsubmit="return validateForm()">
             <div class="form-group input-group-lg">
@@ -91,7 +95,7 @@
                <div class="col-lg-2">
                   <div class="input-group-lg">
                      <label>Save?</label>
-                     <input type="checkbox" class="form-control" id="save">
+                     <input type="checkbox" class="form-control" checked="true" id="save">
                   </div>
                </div>
                <div class="col-lg-2">
@@ -102,23 +106,16 @@
                </div>
             </div>
             <!-- /.row -->
-            <textarea id="code" rows="4" cols="50"># Put you navigator code here.</textarea>
-            <script>
-            var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("code"), {"theme":"icecoder"});
-            </script>
-
+            <textarea id="code" rows="4" cols="50"># Put your navigator code here.</textarea>
             <div class="form-group btn-group-lg" style="padding-top:40px">
-            <button type="submit" class="btn btn-default">Test</button>
-            <button type="submit" class="btn btn-info">Submit</button>
-
-          </div>
-
-
+               <button type="submit" class="btn btn-default">Test</button>
+               <button type="submit" class="btn btn-info">Submit</button>
+            </div>
          </form>
       </div>
-      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+
+      <script src="js/netscrape.js"></script>
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-      <!-- Include all compiled plugins (below), or include individual files as needed -->
       <script src="js/bootstrap.min.js"></script>
    </body>
 </html>
