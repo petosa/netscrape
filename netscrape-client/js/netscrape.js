@@ -53,6 +53,8 @@ var sendForm = function(form) {
         "headers": {},
         "processData": false,
         "contentType": false,
+        "username": "admin",
+        "password": "secret",
         "mimeType": "multipart/form-data",
         "data": form,
         "success": function(result) {

@@ -6,18 +6,20 @@ from flask_cors import CORS
 from pymongo import MongoClient
 from flask_restful import reqparse, Api, Resource, abort, inputs
 
+from netscrape.auth import *
 from netscrape.daemon import daemon
 from netscrape.db_interface import db_interface
 
 
 logging.basicConfig(filename="netscrape.log", level=logging.INFO, format="[%(asctime)s] %(levelname)s: %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p")
 app = Flask(__name__)
-CORS(app)
+CORS(app) # Enable CORS
 logging.info("Starting server.")
 client = MongoClient(os.environ["MONGO_URI"])
 system_db = "sys"
 data_db = "data"
 schedule_col = "schedule"
+
 try:
     interface = db_interface(client, system_db, data_db, schedule_col, username=os.environ["MONGO_USER"], password=os.environ["MONGO_PASS"])
 except KeyError:
@@ -51,14 +53,17 @@ def service_failed(e):
     logging.exception("Unable to fulfill request. " + str(e))
     return abort(400, message="Unable to fulfill request: " + str(e))
 
-class Schedule(Resource):
 
+class Schedule(Resource):
+    
+    @requires_auth
     def get(self):
         try:
             return interface.get_schedule(), 200
         except Exception as e:
             return service_failed(e)
 
+    @requires_auth
     def put(self):
         try:
             args = parser.parse_args()
@@ -71,9 +76,9 @@ class Schedule(Resource):
             return service_failed(e)
 
 
-
 class Navigator(Resource):
 
+    @requires_auth
     def get(self, navigator_name):
         try:
             nav = interface.get_navigator(navigator_name)
@@ -84,12 +89,14 @@ class Navigator(Resource):
         except Exception as e:
             return service_failed(e)
 
+    @requires_auth
     def patch(self, navigator_name):
         try:
             return interface.update_navigator(navigator_name, fuzzy_parser.parse_args())
         except Exception as e:
             return service_failed(e)
 
+    @requires_auth
     def delete(self, navigator_name):
         try:
             return interface.delete_navigator(navigator_name)
@@ -98,6 +105,8 @@ class Navigator(Resource):
 
 
 class OneData(Resource):
+
+    @requires_auth
     def get(self, navigator_name):
         try:
             nav = interface.get_newest_data(navigator_name)
@@ -110,6 +119,8 @@ class OneData(Resource):
 
 
 class ManyData(Resource):
+
+    @requires_auth
     def get(self, navigator_name):
         try:
             nav = interface.get_history(navigator_name)
