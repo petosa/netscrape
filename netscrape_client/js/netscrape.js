@@ -48,13 +48,14 @@ var sendForm = function(form) {
     var settings = {
         "async": true,
         "crossDomain": true,
-        "url": "http://petosa.ddns.net:5002/schedule",
+        "url": endpoint + "/schedule",
         "method": "PUT",
         "headers": {},
+        "beforeSend": function (xhr){
+            xhr.setRequestHeader("Authorization", "Basic " + btoa(username + ":" + password));
+        },
         "processData": false,
         "contentType": false,
-        "username": "admin",
-        "password": "secret",
         "mimeType": "multipart/form-data",
         "data": form,
         "success": function(result) {

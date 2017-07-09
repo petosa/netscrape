@@ -1,30 +1,37 @@
-import os
 import logging
+import os
 
 from flask import Flask
 from flask_cors import CORS
 from pymongo import MongoClient
 from flask_restful import reqparse, Api, Resource, abort, inputs
+from configparser import ConfigParser
 
 from netscrape.auth import *
 from netscrape.daemon import daemon
 from netscrape.db_interface import db_interface
 
 
+config = ConfigParser()
+config.read(os.path.join(os.path.dirname( __file__ ), "..", "config.ini"))
+MONGO_URI = config["server"]["MONGO_URI"]
+SERVER_PORT = int(config["server"]["SERVER_PORT"])
+SYSTEM_DB = config["server"]["SYSTEM_DB"]
+DATA_DB = config["server"]["DATA_DB"]
+SCHEDULE_COL = config["server"]["SCHEDULE_COL"]
+
 logging.basicConfig(filename="netscrape.log", level=logging.INFO, format="[%(asctime)s] %(levelname)s: %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p")
 app = Flask(__name__)
 CORS(app) # Enable CORS
 logging.info("Starting server.")
-client = MongoClient(os.environ["MONGO_URI"])
-system_db = "sys"
-data_db = "data"
-schedule_col = "schedule"
+client = MongoClient(MONGO_URI)
 
-try:
-    interface = db_interface(client, system_db, data_db, schedule_col, username=os.environ["MONGO_USER"], password=os.environ["MONGO_PASS"])
-except KeyError:
+if "MONGO_USER" in config["server"] and "MONGO_PASS" in config["server"] != None:
+    interface = db_interface(client, SYSTEM_DB, DATA_DB, SCHEDULE_COL, username=config["server"]["MONGO_USER"], password=config["server"]["MONGO_PASS"])
+else:
     logging.info("Running without authentication.")
-    interface = db_interface(client, system_db, data_db, schedule_col)
+    interface = db_interface(client, SYSTEM_DB, DATA_DB, SCHEDULE_COL)
+
 daemon(interface)
 
 # Set up body parsing for put
@@ -141,4 +148,4 @@ api.add_resource(ManyData, '/data/<navigator_name>')
 
 
 
-app.run(host='0.0.0.0', port=os.environ["FLASK_PORT"])
+app.run(host='0.0.0.0', port=SERVER_PORT)
