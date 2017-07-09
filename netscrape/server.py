@@ -148,4 +148,7 @@ api.add_resource(ManyData, '/data/<navigator_name>')
 
 
 
-app.run(host='0.0.0.0', port=SERVER_PORT)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=SERVER_PORT)
+else:
+    app.run(port=SERVER_PORT)
