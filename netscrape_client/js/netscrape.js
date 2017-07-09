@@ -26,12 +26,6 @@ var validateForm = function() {
         runevery *= 1000 * 60 * 60 * 24;
     }
 
-    console.log(name != "")
-    console.log(runevery != "")
-    console.log(scale != "")
-    console.log(password != "")
-    console.log(code != "")
-
     if (name != "" && runevery != "" && scale != "" && username != "" && password != "" && code != "" && (infinite || times != "")) {
         var form = new FormData();
         form.append("name", name);
@@ -59,7 +53,7 @@ var sendForm = function(form) {
         "method": "PUT",
         "headers": {},
         "beforeSend": function (xhr){
-            xhr.setRequestHeader("Authorization", "Basic " + btoa(username + ":" + password));
+            xhr.setRequestHeader("Authorization", "Basic " + btoa( document.getElementById("username").value + ":" + document.getElementById("password").value ));
         },
         "processData": false,
         "contentType": false,
