@@ -21,8 +21,6 @@
       <![endif]-->
       <script>
          endpoint = "{{ endpoint }}";
-         username = "{{ username }}";
-         password = "{{ password }}";
       </script>
    </head>
    <body>
@@ -66,7 +64,7 @@
                <label>Description:</label>
                <input type="text" class="form-control" id="description">
             </div>
-            <div class="row" style="padding-bottom: 30px;">
+            <div class="row" style="padding-bottom: 10px;">
                <div class="col-lg-2">
                   <div class="input-group-lg">
                      <label>Run every:</label>
@@ -111,7 +109,23 @@
                </div>
             </div>
             <!-- /.row -->
-            <textarea id="code" rows="4" cols="50"># Put your navigator code here.</textarea>
+             <div class="row" style="padding-bottom: 30px;">
+               <div class="col-lg-6">
+                   <div class="input-group-lg">
+                     <label>Username:</label>
+                     <input type="text" class="form-control" id="username">
+                  </div>
+               </div>
+                 <div class="col-lg-6">
+                   <div class="input-group-lg">
+                     <label>Password:</label>
+                     <input type="password" class="form-control" id="password">
+                  </div>
+               </div>
+             </div>
+             <!-- /.row -->
+            <label>Code:</label>
+            <textarea id="code" rows="4" cols="50"></textarea>
             <div class="form-group btn-group-lg" style="padding-top:40px">
                <button type="submit" class="btn btn-default">Test</button>
                <button type="submit" class="btn btn-info">Submit</button>

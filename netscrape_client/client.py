@@ -15,7 +15,7 @@ CORS(app)
 
 @app.route("/")
 def index():
-    return render_template("index.html", endpoint=ENDPOINT, username="admin", password="secret")
+    return render_template("index.html", endpoint=ENDPOINT)
 
 @app.route("/js/<path:path>")
 def send_js(path):

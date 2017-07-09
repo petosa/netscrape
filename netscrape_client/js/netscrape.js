@@ -14,6 +14,8 @@ var validateForm = function() {
     var times = document.getElementById("times").value;
     var save = document.getElementById("save").checked;
     var schema = document.getElementById("schema").checked;
+    var username = document.getElementById("username").value;
+    var password = document.getElementById("password").value;
 
     if (scale == "sec") {
         runevery *= 1000;
@@ -25,7 +27,7 @@ var validateForm = function() {
         runevery *= 1000 * 60 * 60 * 24;
     }
 
-    if (name != "" && runevery != "" && scale != "" && code != "" && (infinite || times)) {
+    if (name != "" && runevery != "" && scale != "" && username != "" && password != "" && code != "" && (infinite || times)) {
         var form = new FormData();
         form.append("name", name);
         form.append("function", code);
