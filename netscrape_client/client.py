@@ -26,4 +26,5 @@ def send_css(path):
     return send_from_directory("css", path)
 
 
-app.run(host='0.0.0.0', port=CLIENT_PORT)
+def get_app():
+    return app, CLIENT_PORT
