@@ -2,14 +2,13 @@ var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("code"), {
     "theme": "icecoder"
 });
 
-
 var validateForm = function() {
 
     var name = document.getElementById("name").value;
     var description = document.getElementById("description").value;
     var runevery = document.getElementById("runevery").value;
     var scale = document.getElementById("scale").value;
-    var code = document.getElementById("code").value;
+    var code = myCodeMirror.getValue();
     var infinite = document.getElementById("infinite").checked;
     var times = document.getElementById("times").value;
     var save = document.getElementById("save").checked;
@@ -27,7 +26,13 @@ var validateForm = function() {
         runevery *= 1000 * 60 * 60 * 24;
     }
 
-    if (name != "" && runevery != "" && scale != "" && username != "" && password != "" && code != "" && (infinite || times)) {
+    console.log(name != "")
+    console.log(runevery != "")
+    console.log(scale != "")
+    console.log(password != "")
+    console.log(code != "")
+
+    if (name != "" && runevery != "" && scale != "" && username != "" && password != "" && code != "" && (infinite || times != "")) {
         var form = new FormData();
         form.append("name", name);
         form.append("function", code);
