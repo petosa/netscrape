@@ -15,7 +15,7 @@ from netscrape.db_interface import db_interface
 config = ConfigParser()
 config.read(os.path.join(os.path.dirname( __file__ ), "..", "config.ini"))
 MONGO_URI = config["server"]["MONGO_URI"]
-FLASK_PORT = int(config["server"]["FLASK_PORT"])
+FLASK_SERVER_PORT = int(config["server"]["FLASK_SERVER_PORT"])
 SYSTEM_DB = config["server"]["SYSTEM_DB"]
 DATA_DB = config["server"]["DATA_DB"]
 SCHEDULE_COL = config["server"]["SCHEDULE_COL"]
@@ -147,7 +147,7 @@ api.add_resource(OneData, '/data/<navigator_name>/top')
 api.add_resource(ManyData, '/data/<navigator_name>')
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=FLASK_PORT)
+    app.run(host="0.0.0.0", port=FLASK_SERVER_PORT)
 
 def get_app():
     return app
