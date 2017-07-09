@@ -25,6 +25,8 @@ def send_js(path):
 def send_css(path):
     return send_from_directory("css", path)
 
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=CLIENT_PORT)
 
 def get_app():
-    return app, CLIENT_PORT
+    return app
