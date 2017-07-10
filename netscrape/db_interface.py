@@ -45,7 +45,7 @@ class db_interface():
             exec(args["function"], {"utility": utility(self)}, loc)
             return loc["output"]
         except Exception as e:
-            return e
+            return str(e)
 
     def update_navigator(self, name, args):
         update_document = {}
