@@ -52,6 +52,10 @@ var validateForm = function() {
         form.append("times", infinite ? -1 : times);
         form.append("schema", schema);
 
+        if (description != "") {
+            form.append("description", description)
+        }
+
         success = function(result) {
             document.getElementById("successName").innerHTML = form.get("name");
             document.getElementById("successId").innerHTML = result;
