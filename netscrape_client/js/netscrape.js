@@ -2,6 +2,24 @@ var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("code"), {
     "theme": "icecoder"
 });
 
+var testFunction = function() {
+    var code = myCodeMirror.getValue();
+    if (code == "") {
+        document.getElementById("failedMessage").innerHTML = "You must add a function before testing.";
+        document.getElementById("failedAlert").style = "display: block;";
+        document.getElementById("successAlert").style = "display: none;";
+        return;
+    }
+    var form = new FormData();
+    form.append("function", code);
+
+    success = function(result) {
+        alert(result)
+    }
+
+    sendForm(form, "POST", "/test", success);
+}
+
 var validateForm = function() {
 
     var name = document.getElementById("name").value;
@@ -11,7 +29,6 @@ var validateForm = function() {
     var code = myCodeMirror.getValue();
     var infinite = document.getElementById("infinite").checked;
     var times = document.getElementById("times").value;
-    var save = document.getElementById("save").checked;
     var schema = document.getElementById("schema").checked;
     var username = document.getElementById("username").value;
     var password = document.getElementById("password").value;
@@ -33,33 +50,9 @@ var validateForm = function() {
         form.append("next", 0);
         form.append("every", runevery);
         form.append("times", infinite ? -1 : times);
-        form.append("save", save);
         form.append("schema", schema);
-        sendForm(form);
-    } else {
-        document.getElementById("failedMessage").innerHTML = "You must complete all required fields before you can submit.";
-        document.getElementById("failedAlert").style = "display: block;";
-        document.getElementById("successAlert").style = "display: none;";
-    }
-    return false;
-}
 
-
-var sendForm = function(form) {
-    var settings = {
-        "async": true,
-        "crossDomain": true,
-        "url": endpoint + "/schedule",
-        "method": "PUT",
-        "headers": {},
-        "beforeSend": function (xhr){
-            xhr.setRequestHeader("Authorization", "Basic " + btoa( document.getElementById("username").value + ":" + document.getElementById("password").value ));
-        },
-        "processData": false,
-        "contentType": false,
-        "mimeType": "multipart/form-data",
-        "data": form,
-        "success": function(result) {
+        success = function(result) {
             document.getElementById("successName").innerHTML = form.get("name");
             document.getElementById("successId").innerHTML = result;
             document.getElementById("name").value = "";
@@ -69,12 +62,37 @@ var sendForm = function(form) {
             document.getElementById("infinite").checked = true;
             document.getElementById("times").value = "";
             document.getElementById("times").disabled = true;
-            document.getElementById("save").checked = true;
             document.getElementById("schema").checked = false;
             document.getElementById("failedAlert").style = "display: none;";
             document.getElementById("successAlert").style = "display: block;";
-            myCodeMirror.setValue("# Put your navigator code here.");
+        }
+
+        sendForm(form, "PUT", "/schedule", success);
+
+    } else {
+        document.getElementById("failedMessage").innerHTML = "You must complete all required fields before you can submit.";
+        document.getElementById("failedAlert").style = "display: block;";
+        document.getElementById("successAlert").style = "display: none;";
+    }
+    return false;
+}
+
+
+var sendForm = function(form, verb, path, success) {
+    var settings = {
+        "async": true,
+        "crossDomain": true,
+        "url": endpoint + path,
+        "method": verb,
+        "headers": {},
+        "beforeSend": function (xhr){
+            xhr.setRequestHeader("Authorization", "Basic " + btoa( document.getElementById("username").value + ":" + document.getElementById("password").value ));
         },
+        "processData": false,
+        "contentType": false,
+        "mimeType": "multipart/form-data",
+        "data": form,
+        "success": success,
         "error": function(request, status, errorThrown) {
             document.getElementById("failedMessage").innerHTML = errorThrown;
             document.getElementById("failedAlert").style = "display: block;";

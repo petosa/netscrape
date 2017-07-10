@@ -35,26 +35,6 @@ def test_simple_put():
         "next": 0,
         "every": 1,
         "times": 1,
-        "save": False,
-        "schema": False,
-        "function": "output = \"Answer\""
-    })
-    sleep(1)
-    assert len(interface().get_schedule()) == 1
-    assert interface().get_newest_data("ArizonaIcedTea") == None
-    assert len(interface().get_history("ArizonaIcedTea")) == 0
-    d.stop()
-
-def test_simple_put_saved():
-    d = daemon(interface())
-    assert len(interface().get_history("ArizonaIcedTea")) == 0
-    interface().put_navigator({
-        "name": "ArizonaIcedTea",
-        "description": "Tea",
-        "next": 0,
-        "every": 1,
-        "times": 1,
-        "save": True,
         "schema": False,
         "function": "output = \"Answer\""
     })
@@ -73,7 +53,6 @@ def test_multiple_times():
         "next": 0,
         "every": 1,
         "times": 5,
-        "save": True,
         "schema": False,
         "function": "output = \"Answer\""
     })
@@ -92,7 +71,6 @@ def test_utility():
         "next": 0,
         "every": 1,
         "times": 5,
-        "save": True,
         "schema": False,
         "function": "output = \"Answer\""
     })
@@ -103,7 +81,6 @@ def test_utility():
         "next": 0,
         "every": 1,
         "times": 1,
-        "save": True,
         "schema": False,
         "function": "output = utility.get_history(\"ArizonaIcedTea\")"
     })
@@ -120,7 +97,6 @@ def test_url_download():
         "next": 0,
         "every": 1,
         "times": 1,
-        "save": True,
         "schema": False,
         "function": "output = utility.download_page_with_encoding(\"http://www.example.com/\", \"utf8\")"
     })

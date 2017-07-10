@@ -62,20 +62,20 @@ class daemon:
                 logging.exception("The output string for navigator " + nav["name"] + " cannot be parsed into JSON.")
                 self.critical_navigator_error(nav["name"])
                 return
-            if nav["save"]: # Should we attempt to save?
-                latest = json.loads(dumps(self.interface.get_newest_data(nav["name"]))) # BSON -> String -> JSON
-                try:
-                    if nav["schema"] and latest: # Only run if this is not the first element to be added to this data collection.
-                        assert(self.interface.schema_assertion(parsed_json, latest["data"]))
-                    self.interface.save_data(nav["name"], parsed_bson, call_time)
-                    if nav["schema"]:
-                        logging.info("SCHEMA PASSED ✔")
-                    logging.info("SAVED " + nav["name"])
-                except AssertionError:
-                    logging.exception("Schema assertion has failed! The underlying data structure for " + nav["name"] + " has changed.")
-                    #logging.error("Current schema:\n" + json.dumps(parsed_json, indent=4))
-                    #logging.error("Old schema:\n" + dumps(latest["data"], indent=4))
-                    self.critical_navigator_error(nav["name"])
+            # Attempt to save
+            latest = json.loads(dumps(self.interface.get_newest_data(nav["name"]))) # BSON -> String -> JSON
+            try:
+                if nav["schema"] and latest: # Only run if this is not the first element to be added to this data collection.
+                    assert(self.interface.schema_assertion(parsed_json, latest["data"]))
+                self.interface.save_data(nav["name"], parsed_bson, call_time)
+                if nav["schema"]:
+                    logging.info("SCHEMA PASSED ✔")
+                logging.info("SAVED " + nav["name"])
+            except AssertionError:
+                logging.exception("Schema assertion has failed! The underlying data structure for " + nav["name"] + " has changed.")
+                #logging.error("Current schema:\n" + json.dumps(parsed_json, indent=4))
+                #logging.error("Old schema:\n" + dumps(latest["data"], indent=4))
+                self.critical_navigator_error(nav["name"])
         else:
             logging.error("Navigator " + nav["name"] + " does not set 'output' value in its parse function. Failed.")
             self.critical_navigator_error(nav["name"])

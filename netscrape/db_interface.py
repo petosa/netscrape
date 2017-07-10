@@ -1,6 +1,9 @@
 from bson.json_util import dumps
 import json
 
+from netscrape.utility import utility
+
+
 class db_interface():
 
     def __init__(self, client, system_db, data_db, schedule_col, username=None, password=None,):
@@ -28,7 +31,6 @@ class db_interface():
             "next": args["next"],
             "every": args["every"],
             "times": args["times"],
-            "save": args["save"],
             "schema": args["schema"],
             "function": args["function"]
         }
@@ -36,6 +38,14 @@ class db_interface():
             return str((self.client[self.system_db][self.schedule_col].insert_one(document)).inserted_id)
         else:
             return None
+
+    def test_navigator(self, args):
+        loc = {}
+        try:
+            exec(args["function"], {"utility": utility(self)}, loc)
+            return loc["output"]
+        except Exception as e:
+            return e
 
     def update_navigator(self, name, args):
         update_document = {}
