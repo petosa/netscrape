@@ -1,9 +1,9 @@
 from distutils.core import setup
 
 setup(
-    name='Netscrape',
+    name='skython',
     version='1.0',
-    packages=['netscrape', 'netscrape.navigators'],
+    packages=['skython'],
     url='',
     license='MIT',
     author='nick petosa',

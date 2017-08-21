@@ -1,0 +1,25 @@
+.infopane {
+    text-align: left;
+    margin-left: 60px;
+    margin-right: 60px;
+    margin-top: 60px;
+    font-family: 'Raleway', sans-serif;
+}
+
+.sublime {
+    font-size: 30px;
+    font-family: 'Raleway', sans-serif;
+}
+
+.argtable {
+    width: 100%;
+    font-size: 35px;
+}
+
+.argtable tr:nth-child(odd){background-color: #e1e1e1;}
+.argtable tr:nth-child(even){background-color: #f1f1f1;}
+
+.argtable th, td {
+    padding: 40px;
+    margin-top: 40px;
+}

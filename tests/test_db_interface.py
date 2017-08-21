@@ -1,19 +1,9 @@
 from time import sleep
 
 import pytest
-
 from pymongo import MongoClient
 
-from netscrape.daemon import daemon
-from netscrape.db_interface import db_interface
-
-
-def interface():
-    client = MongoClient("127.0.0.1")
-    system_db = "test-sys"
-    data_db = "test-data"
-    schedule_col = "test-schedule"
-    return db_interface(client, system_db, data_db, schedule_col)
+from skython.db_interface import db_interface
 
 @pytest.fixture(autouse=True)
 def setup():
@@ -21,88 +11,82 @@ def setup():
     yield
     interface().nuke()
 
+def interface():
+    client = MongoClient("127.0.0.1")
+    system_db = "test"
+    schedule_col = "catalog"
+    return db_interface(client, system_db, schedule_col)
+
 def test_empty_schedule():
-    assert interface().get_schedule() == []
+    assert interface().get_catalog() == []
 
-def test_no_navigators_queued():
-    assert interface().get_next() == None
-
-def test_simple_put():
-    d = daemon(interface())
-    interface().put_navigator({
+def test_put_and_delete():
+    assert len(interface().get_catalog()) == 0
+    interface().put_lambda({
         "name": "ArizonaIcedTea",
         "description": "Tea",
-        "next": 0,
-        "every": 1,
-        "times": 1,
-        "schema": False,
+        "args": {},
         "function": "output = \"Answer\""
     })
     sleep(1)
-    assert len(interface().get_schedule()) == 1
-    assert interface().get_newest_data("ArizonaIcedTea") != None
-    assert len(interface().get_history("ArizonaIcedTea")) == 1
-    d.stop()
+    assert len(interface().get_catalog()) == 1
+    assert(interface().delete_lambda("ArizonaIcedTea"))
+    assert len(interface().get_catalog()) == 0
 
-def test_multiple_times():
-    d = daemon(interface())
-    assert len(interface().get_history("ArizonaIcedTea")) == 0
-    interface().put_navigator({
+def test_function_simple():
+    assert(interface().run_function("output = 5", {}) == 5)
+
+def test_function_advanced():
+    assert(interface().run_function("output = int(val1) + int(val2)", {"val1": 1, "val2": 2}) == 3)
+
+def test_function_from_catalog_int():
+    assert len(interface().get_catalog()) == 0
+    interface().put_lambda({
         "name": "ArizonaIcedTea",
         "description": "Tea",
-        "next": 0,
-        "every": 1,
-        "times": 5,
-        "schema": False,
-        "function": "output = \"Answer\""
+        "args": {"flavor" : "A cool value"},
+        "function": "output = [flavor]"
     })
     sleep(1)
-    assert len(interface().get_schedule()) == 1
-    assert interface().get_newest_data("ArizonaIcedTea") != None
-    assert len(interface().get_history("ArizonaIcedTea")) == 5
-    d.stop()
+    assert len(interface().get_catalog()) == 1
+    lam = interface().get_lambda("ArizonaIcedTea")
+    assert(interface().run_function(lam["function"], {"flavor": "1"}) == [1])
 
-def test_utility():
-    d = daemon(interface())
-    assert len(interface().get_history("ArizonaIcedTea")) == 0
-    interface().put_navigator({
+def test_function_from_catalog_str():
+    assert len(interface().get_catalog()) == 0
+    interface().put_lambda({
         "name": "ArizonaIcedTea",
         "description": "Tea",
-        "next": 0,
-        "every": 1,
-        "times": 5,
-        "schema": False,
-        "function": "output = \"Answer\""
+        "args": {"flavor" : "A cool value"},
+        "function": "output = [flavor]"
     })
     sleep(1)
-    interface().put_navigator({
-        "name": "SnapplePeachTea",
-        "description": "Tea",
-        "next": 0,
-        "every": 1,
-        "times": 1,
-        "schema": False,
-        "function": "output = utility.get_history(\"ArizonaIcedTea\")"
-    })
-    sleep(.1)
-    assert len(interface().get_newest_data("SnapplePeachTea")["data"]) == 5
-    d.stop()
+    assert len(interface().get_catalog()) == 1
+    lam = interface().get_lambda("ArizonaIcedTea")
+    assert(interface().run_function(lam["function"], {"flavor": "\"cat\""}) == ["cat"])
 
-def test_url_download():
-    d = daemon(interface())
-    assert len(interface().get_history("ArizonaIcedTea")) == 0
-    interface().put_navigator({
+def test_function_from_catalog_dict():
+    assert len(interface().get_catalog()) == 0
+    interface().put_lambda({
         "name": "ArizonaIcedTea",
         "description": "Tea",
-        "next": 0,
-        "every": 1,
-        "times": 1,
-        "schema": False,
-        "function": "output = utility.download_page_with_encoding(\"http://www.example.com/\", \"utf8\")"
+        "args": {"flavor" : "A cool value"},
+        "function": "output = [flavor]"
     })
-    sleep(3)
-    assert len(interface().get_schedule()) == 1
-    assert interface().get_newest_data("ArizonaIcedTea") != None
-    assert "Example Domain" in interface().get_newest_data("ArizonaIcedTea")["data"]
+    sleep(1)
+    assert len(interface().get_catalog()) == 1
+    lam = interface().get_lambda("ArizonaIcedTea")
+    assert(interface().run_function(lam["function"], {"flavor": "{\"val\": 1}"}) == [{"val":1}])
 
-    d.stop()
+def test_function_from_catalog_fail():
+    assert len(interface().get_catalog()) == 0
+    interface().put_lambda({
+        "name": "ArizonaIcedTea",
+        "description": "Tea",
+        "args": {"flavor" : "A cool value"},
+        "function": "output = [flavor]"
+    })
+    sleep(1)
+    assert len(interface().get_catalog()) == 1
+    lam = interface().get_lambda("ArizonaIcedTea")
+    assert(interface().run_function(lam["function"], {"flavor": "Invalid thing"}) == "Exception in function: Expecting value: line 1 column 1 (char 0)")

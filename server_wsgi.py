@@ -1,3 +1,3 @@
-from netscrape.server import get_app
+from skython.server import get_app
 
 app = get_app()

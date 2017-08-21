@@ -1,0 +1,26 @@
+.list {
+    width: 25%;
+    background: #444;
+    position: fixed;
+    height: calc(100% - 190px);
+    left: 0;
+    overflow-y: scroll;
+    overflow-x: none;
+}
+
+.info {
+    margin-left: 25%;
+    width: 75%;
+    background:#666;
+    position: fixed;
+    height: calc(100% - 190px);
+    overflow-y: scroll;
+}
+
+.nocontext {
+    background:#666;
+}
+
+.context {
+    background:#f8f8ff;
+}
